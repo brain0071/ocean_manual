@@ -6,7 +6,7 @@
     <!-- pixhawk -->
     <arg name="fcu_url" default="/dev/ttyACM0:57600" />
     <!-- qgc  -->
-    <arg name="gcs_url" default="tcp-l://127.0.0.1:5761" />
+    <arg name="gcs_url" default="tcp-l://192.168.0.9:5760" />
     
     <arg name="tgt_system" default="1" />
     <arg name="tgt_component" default="1" />
@@ -28,10 +28,5 @@
     
     <node pkg="ocean_manual" type="run_manual" name="run_manual" clear_params="true" output="screen">
 	</node>
-
-    <!-- xsens node -->
-    <node name="xsens_mti_node" pkg="xsens_mti_driver" type="xsens_mti_node" output="screen">
-            <rosparam command="load" file="$(find xsens_mti_driver)/param/xsens_mti_node.yaml" />
-    </node>
         
 </launch>

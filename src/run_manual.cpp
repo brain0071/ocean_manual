@@ -2,6 +2,7 @@
 #include <iostream>
 #include "ros/ros.h"
 #include "std_msgs/String.h"
+#include <mavros_msgs/ManualControl.h>
 #include <mavros_msgs/ActuatorControl.h>
 #include <mavros_msgs/WheelOdomStamped.h>
 #include <mavros_msgs/Mavlink.h>
@@ -10,7 +11,7 @@
 #include <Eigen/QR> 
 
 
-ros::Publisher control_pub;
+// ros::Publisher control_pub;
 
 bool convert(const mavros_msgs::Mavlink &rmsg, mavlink_message_t &mmsg)
 {
@@ -39,7 +40,7 @@ bool convert(const mavros_msgs::Mavlink &rmsg, mavlink_message_t &mmsg)
 }
 
 
-void mavlinkCallback(const mavros_msgs::Mavlink::ConstPtr &rmsg, ros::Publisher* manual_pub, ros::Publisher* motor_pub)
+void mavlinkCallback(const mavros_msgs::Mavlink::ConstPtr &rmsg, ros::Publisher* manual_pub, ros::Publisher* motor_pub, ros::Publisher* joystick_pub)
 {
     mavlink_message_t mmsg;
     convert(*rmsg, mmsg);
@@ -58,6 +59,7 @@ void mavlinkCallback(const mavros_msgs::Mavlink::ConstPtr &rmsg, ros::Publisher*
     pitch = -packet.y / 1000.0 * 0.6;
     yaw = (packet.z - 500.0) / 500.0 * 0.6;
 
+    
     switch (packet.buttons) {
     
     case 4096: { 
@@ -94,11 +96,21 @@ void mavlinkCallback(const mavros_msgs::Mavlink::ConstPtr &rmsg, ros::Publisher*
         z = 0;
         break;
     }
- 
+    
+    // send joystick signals
+    mavros_msgs::ManualControl joystick_msg;
+    joystick_msg.header.stamp = ros::Time::now();
+    joystick_msg.x = packet.x;
+    joystick_msg.y = packet.y;
+    joystick_msg.z = packet.z;
+    joystick_msg.r = packet.r;
+    joystick_msg.buttons = packet.buttons;
+    joystick_pub->publish(joystick_msg);
+
     // send control 
     mavros_msgs::WheelOdomStamped msg;
-    msg.header.stamp = ros::Time::now();
     msg.data.clear();
+    msg.header.stamp = ros::Time::now();
     msg.data.push_back(x);
     msg.data.push_back(y);
     msg.data.push_back(z);
@@ -160,10 +172,12 @@ int main(int argc, char *argv[])
 {
 	ros::init(argc, argv, "manual");
 	ros::NodeHandle nh;
+
     ros::Publisher manual_pub = nh.advertise<mavros_msgs::WheelOdomStamped>("/manual_control", 10);
     ros::Publisher motor_pub = nh.advertise<mavros_msgs::ActuatorControl>("/mavros/actuator_control", 10);
-
-    ros::Subscriber sub = nh.subscribe<mavros_msgs::Mavlink>("/mavlink/from", 10, boost::bind(mavlinkCallback, _1, &manual_pub, &motor_pub));
+    // 20240924: get joystick
+    ros::Publisher joystick_pub = nh.advertise<mavros_msgs::ManualControl>("/joystick", 10);
+    ros::Subscriber sub = nh.subscribe<mavros_msgs::Mavlink>("/mavlink/from", 10, boost::bind(mavlinkCallback, _1, &manual_pub, &motor_pub, &joystick_pub));
 	ros::spin();
 	return 0;
 }
