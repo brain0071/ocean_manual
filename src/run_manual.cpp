@@ -57,33 +57,33 @@ void mavlinkCallback(const mavros_msgs::Mavlink::ConstPtr &rmsg, ros::Publisher*
     // use 60% power
     roll = packet.x / 1000.0 * 0.6;
     pitch = -packet.y / 1000.0 * 0.6;
-    yaw = (packet.z - 500.0) / 500.0 * 0.6;
+    yaw = -packet.r / 1000.0 * 0.6;
 
     
     switch (packet.buttons) {
     
-    case 4096: { 
+    case 2048: { 
         x = 1 * 0.6;
         y = 0;
         z = 0; 
         break; 
         }
     
-    case 8192: { 
+    case 4096: { 
         x = -1 * 0.6; 
         y = 0;
         z = 0; 
         break; 
         }
 
-    case 16384: { 
+    case 8: { 
         x = 0;
         y = 0;
         z = 1 * 0.6;
         break; 
         }
     
-    case 32768: { 
+    case 1: { 
         x = 0;
         y = 0;
         z = -1 * 0.6; 
