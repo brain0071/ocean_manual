@@ -57,7 +57,7 @@ void mavlinkCallback(const mavros_msgs::Mavlink::ConstPtr &rmsg, ros::Publisher*
     // buttons 16384/32768: z+/z-
     // use 60% power
     // deadzone:0.05
-    printf("%f", packet.x);
+    printf("packet.x: %f\n", packet.x);
 
     if (std::abs(packet.x) < 0.05) {
         roll = 0; 
@@ -65,7 +65,7 @@ void mavlinkCallback(const mavros_msgs::Mavlink::ConstPtr &rmsg, ros::Publisher*
         roll = packet.x / 1000.0 * 0.6;  
     }
 
-    printf("%f", roll);
+    printf("roll: %f\n", roll);
 
     if (std::abs(packet.y) < 0.05) {
         pitch = 0; 
