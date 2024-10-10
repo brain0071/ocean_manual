@@ -9,6 +9,7 @@
 #include <mavlink/v2.0/common/mavlink.h>
 #include <Eigen/Dense>
 #include <Eigen/QR> 
+#include <cmath>
 
 
 // ros::Publisher control_pub;
@@ -56,7 +57,8 @@ void mavlinkCallback(const mavros_msgs::Mavlink::ConstPtr &rmsg, ros::Publisher*
     // buttons 16384/32768: z+/z-
     // use 60% power
     // deadzone:0.05
-    
+    printf("%f", packet.x);
+
     if (std::abs(packet.x) < 0.05) {
         roll = 0; 
     } else {
