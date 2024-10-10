@@ -65,6 +65,8 @@ void mavlinkCallback(const mavros_msgs::Mavlink::ConstPtr &rmsg, ros::Publisher*
         roll = packet.x / 1000.0 * 0.6;  
     }
 
+    printf("%f", roll);
+
     if (std::abs(packet.y) < 0.05) {
         pitch = 0; 
     } else {
