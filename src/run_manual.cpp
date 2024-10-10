@@ -55,10 +55,25 @@ void mavlinkCallback(const mavros_msgs::Mavlink::ConstPtr &rmsg, ros::Publisher*
     // buttons 4096/8192: x+/x-
     // buttons 16384/32768: z+/z-
     // use 60% power
-    roll = packet.x / 1000.0 * 0.6;
-    pitch = -packet.y / 1000.0 * 0.6;
-    yaw = -packet.r / 1000.0 * 0.6;
+    // deadzone:0.05
+    
+    if (std::abs(packet.x) < 0.05) {
+        roll = 0; 
+    } else {
+        roll = packet.x / 1000.0 * 0.6;  
+    }
 
+    if (std::abs(packet.y) < 0.05) {
+        pitch = 0; 
+    } else {
+        pitch = -packet.y / 1000.0 * 0.6; 
+    }
+
+    if (std::abs(packet.r) < 0.05) {
+        yaw = 0; 
+    } else {
+        yaw = -packet.r / 1000.0 * 0.6;
+    }
     
     switch (packet.buttons) {
     
