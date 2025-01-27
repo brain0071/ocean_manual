@@ -30,5 +30,8 @@
     
     <node pkg="ocean_manual" type="run_manual" name="run_manual" clear_params="true" output="screen">
 	</node>
+
+    <node pkg="ocean_manual" type="send_attitude_target.py" name="send_attitude_target" clear_params="true" output="screen">
+	</node>
         
 </launch>
