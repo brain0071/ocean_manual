@@ -10,6 +10,7 @@ project(ocean_manual)
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   std_msgs
+  mavros_msgs
 )
 
 # naodai
@@ -121,7 +122,7 @@ include_directories(
 # include
   ${catkin_INCLUDE_DIRS}
   # naodai
-  /home/naodai/WorkSpace/manual_test/mav_ws/src/mavros
+  /home/naodai/WorkSpace/oceanxer/mav_ws/src/mavros
   /usr/include/eigen3
 )
 

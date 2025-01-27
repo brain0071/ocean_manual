@@ -4,9 +4,11 @@
     <!-- sitl test -->
     <!-- <arg name="fcu_url" default="udp://127.0.0.1:14551@14555" /> -->
     <!-- pixhawk -->
-    <arg name="fcu_url" default="/dev/ttyACM0:57600" />
-    <!-- qgc  -->
-    <arg name="gcs_url" default="tcp-l://192.168.0.9:5760" />
+    <!-- <arg name="fcu_url" default="/dev/ttyACM0:57600" /> -->
+    <!-- sitl test -->
+	<arg name="fcu_url" default="udp://127.0.0.1:14551@14555" />
+	<!-- qgc  -->
+	<arg name="gcs_url" default="tcp-l://127.0.0.1:5769" />
     
     <arg name="tgt_system" default="1" />
     <arg name="tgt_component" default="1" />
