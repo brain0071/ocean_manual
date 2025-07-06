@@ -11,11 +11,23 @@ find_package(ament_cmake REQUIRED)
 # further dependencies manually.
 # find_package(<dependency> REQUIRED)
 
+# naodai
+find_package(mavros_msgs REQUIRED)
+find_package(mavlink REQUIRED)
+find_package(rclcpp REQUIRED)   
+
 add_executable(run_manual src/run_manual.cpp)
 target_include_directories(run_manual PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
 target_compile_features(run_manual PUBLIC c_std_99 cxx_std_17)  # Require C99 and C++17
+
+# naodai
+ament_target_dependencies(run_manual
+  rclcpp
+  mavros_msgs
+  mavlink
+)
 
 install(TARGETS run_manual
   DESTINATION lib/${PROJECT_NAME})
@@ -31,5 +43,9 @@ if(BUILD_TESTING)
   set(ament_cmake_cpplint_FOUND TRUE)
   ament_lint_auto_find_test_dependencies()
 endif()
+
+install(DIRECTORY launch
+  DESTINATION share/${PROJECT_NAME}/
+)
 
 ament_package()
