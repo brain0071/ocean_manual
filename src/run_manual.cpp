@@ -7,6 +7,12 @@
 #include <mavlink/v2.0/common/mavlink.h>
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/string.hpp"
+#include "std_msgs/msg/bool.hpp"
+#include "std_msgs/msg/float32.hpp"
+
+
+
+
 
 
 class ManualControlNode : public rclcpp::Node {
@@ -18,17 +24,30 @@ class ManualControlNode : public rclcpp::Node {
       "/uas1/mavlink_source", rclcpp::QoS(10).best_effort(), [this](const mavros_msgs::msg::Mavlink::SharedPtr rmsg) {
     this->mavlinkCallback(rmsg);});
 
-    joystick_pub = this->create_publisher<mavros_msgs::msg::ManualControl>(
-    "/joystick", 10);  
+    joystick_pub = this->create_publisher<mavros_msgs::msg::ManualControl>("/joystick", 10);  
+    
+    // 20Hz timer -> 50ms interval
+    timer_ = this->create_wall_timer(std::chrono::milliseconds(50), std::bind(&ManualControlNode::main_callback, this));
+    
+    light_pub_ = this->create_publisher<std_msgs::msg::Bool>("/light", 10);
+    gripper_pub_ = this->create_publisher<std_msgs::msg::Float32>("/gripper", 10);
+    
 
   }
-
 
   private:
 
   rclcpp::Subscription<mavros_msgs::msg::Mavlink>::SharedPtr mavlink_sub;
   rclcpp::Publisher<mavros_msgs::msg::ManualControl>::SharedPtr joystick_pub;
 
+  rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr light_pub_;
+  rclcpp::Publisher<std_msgs::msg::Float32>::SharedPtr gripper_pub_;
+
+  rclcpp::TimerBase::SharedPtr timer_;
+
+  static bool light;
+  static float gripper;
+  
   void mavlinkCallback(const mavros_msgs::msg::Mavlink::SharedPtr rmsg)
   {
     mavlink_message_t mmsg;
@@ -114,11 +133,38 @@ class ManualControlNode : public rclcpp::Node {
         // right(1024): close
         case 512: {
           RCLCPP_INFO(this->get_logger(), "Gripper open");
+          
+          gripper -= (1900-1100) * 0.05;
+          if (gripper < 1100) {
+            gripper = 1100;
+          }
+          
           break; 
         }
     
         case 1024: { 
           RCLCPP_INFO(this->get_logger(), "Gripper close");
+          
+          gripper += (1900-1100) * 0.05;
+          if (gripper > 1900) {
+            gripper = 1900;
+          }
+
+          break; 
+        }
+        
+        // light 
+        // left(16): open 
+        // right(64): close
+        case 16: {
+          RCLCPP_INFO(this->get_logger(), "Light open");
+          light = true;
+          break; 
+        }
+
+        case 64: {
+          RCLCPP_INFO(this->get_logger(), "Light close");
+          light = false;
           break; 
         }
         
@@ -154,8 +200,32 @@ class ManualControlNode : public rclcpp::Node {
     std::copy(rmsg.signature.begin(), rmsg.signature.end(), mmsg.signature);
     return true;
   }
+  
+  void main_callback()
+  {
+    // light
+    std_msgs::msg::Bool light_msg;
+    light_msg.data = light;
+    light_pub_->publish(light_msg);
+
+    // gripper
+    std_msgs::msg::Float32 gripper_msg;
+    gripper_msg.data = gripper; 
+    gripper_pub_->publish(gripper_msg);
+    return;
+  }
+
+
 
 };
+
+bool ManualControlNode::light = false;
+float ManualControlNode::gripper = 1100.0f;
+
+
+
+
+
 
 int main(int argc, char * argv[])
 {
