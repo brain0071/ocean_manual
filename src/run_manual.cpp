@@ -51,6 +51,8 @@ class ManualControlNode : public rclcpp::Node {
   static float yaw;
   static float z;
   static float z_past;
+  static float acce_x;
+  static float acce_y;
   static tf2::Quaternion target_q;
 
 
@@ -82,6 +84,14 @@ class ManualControlNode : public rclcpp::Node {
       manual_msg.aux5 = packet.aux5 / 1000.0;
       manual_msg.aux6 = packet.aux6 / 1000.0;
       joystick_pub->publish(manual_msg);
+
+
+      acce_x = ((packet.z / 1000.0) -0.5) / 0.5 * 0.6;
+      acce_y = packet.y / 1000.0 * 0.6;
+      RCLCPP_INFO(this->get_logger(), "acce_x: %.2f, acce_y: %.2f", acce_x, acce_y);
+      
+
+
       
       switch (packet.buttons) {
         
@@ -256,8 +266,8 @@ class ManualControlNode : public rclcpp::Node {
     geometry_msgs::msg::PoseStamped pose_msg;
     pose_msg.header.stamp = this->get_clock()->now();
     pose_msg.header.frame_id = "map"; 
-    pose_msg.pose.position.x = 0.0;
-    pose_msg.pose.position.y = 0.0;
+    pose_msg.pose.position.x = acce_x;
+    pose_msg.pose.position.y = acce_y;
     pose_msg.pose.position.z = z_target;
     pose_msg.pose.orientation.x = target_q.x();
     pose_msg.pose.orientation.y = target_q.y();
@@ -274,6 +284,8 @@ float ManualControlNode::gripper = 1100.0f;
 float ManualControlNode::roll = 0.0f;
 float ManualControlNode::pitch = 0.0f;
 float ManualControlNode::yaw = 0.0f;
+float ManualControlNode::acce_x = 0.0f;
+float ManualControlNode::acce_y = 0.0f;
 float ManualControlNode::z = 2.0f;
 float ManualControlNode::z_past = 2.0f;
 tf2::Quaternion ManualControlNode::target_q(0, 0, 0, 1); 
