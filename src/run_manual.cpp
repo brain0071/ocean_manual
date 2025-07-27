@@ -88,7 +88,7 @@ class ManualControlNode : public rclcpp::Node {
 
       acce_x = ((packet.z / 1000.0) -0.5) / 0.5 * 0.6;
       acce_y = packet.y / 1000.0 * 0.6;
-      RCLCPP_INFO(this->get_logger(), "acce_x: %.2f, acce_y: %.2f", acce_x, acce_y);
+      // RCLCPP_INFO(this->get_logger(), "acce_x: %.2f, acce_y: %.2f", acce_x, acce_y);
       
 
 
@@ -194,6 +194,22 @@ class ManualControlNode : public rclcpp::Node {
         default: 
           break;
         }
+
+    }
+
+    if (mmsg.msgid == MAVLINK_MSG_ID_SCALED_PRESSURE3) 
+    {
+      // RCLCPP_INFO(this->get_logger(), "Received MAVLINK_MSG_ID_MANUAL_CONTROL (msgid = %d)", mmsg.msgid);
+      mavlink_scaled_pressure3_t packet;
+      mavlink_msg_scaled_pressure3_decode(&mmsg, &packet);
+      // uint64_t time_usec; 
+      // float altitude_monotonic; 
+      // float altitude_amsl; 
+      // float altitude_local; 
+      // float altitude_relative; 
+      // float altitude_terrain; 
+      // float bottom_clearance; 
+      RCLCPP_INFO(this->get_logger(), "press_abs: %f", packet.press_abs);
 
     }
   }
