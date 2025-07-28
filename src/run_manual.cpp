@@ -28,6 +28,7 @@ class ManualControlNode : public rclcpp::Node {
     timer_ = this->create_wall_timer(std::chrono::milliseconds(50), std::bind(&ManualControlNode::main_callback, this));
     light_pub_ = this->create_publisher<std_msgs::msg::Bool>("/light", 10);
     gripper_pub_ = this->create_publisher<std_msgs::msg::Float32>("/gripper", 10);
+    depth_pub_ = this->create_publisher<std_msgs::msg::Float32>("/depth", 10);
     pose_target_pub_ = this->create_publisher<geometry_msgs::msg::PoseStamped>("/target_pose", 10);
     
   }
@@ -39,9 +40,8 @@ class ManualControlNode : public rclcpp::Node {
 
   rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr light_pub_;
   rclcpp::Publisher<std_msgs::msg::Float32>::SharedPtr gripper_pub_;
-
+  rclcpp::Publisher<std_msgs::msg::Float32>::SharedPtr depth_pub_;
   rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr pose_target_pub_;
-
   rclcpp::TimerBase::SharedPtr timer_;
 
   static bool light;
@@ -199,17 +199,15 @@ class ManualControlNode : public rclcpp::Node {
 
     if (mmsg.msgid == MAVLINK_MSG_ID_SCALED_PRESSURE3) 
     {
-      // RCLCPP_INFO(this->get_logger(), "Received MAVLINK_MSG_ID_MANUAL_CONTROL (msgid = %d)", mmsg.msgid);
+      // RCLCPP_INFO(this->get_logger(), "Received MAVLINK_MSG_ID_SCALED_PRESSURE3 (msgid = %d)", mmsg.msgid);
       mavlink_scaled_pressure3_t packet;
       mavlink_msg_scaled_pressure3_decode(&mmsg, &packet);
-      // uint64_t time_usec; 
-      // float altitude_monotonic; 
-      // float altitude_amsl; 
-      // float altitude_local; 
-      // float altitude_relative; 
-      // float altitude_terrain; 
-      // float bottom_clearance; 
-      RCLCPP_INFO(this->get_logger(), "press_abs: %f", packet.press_abs);
+      
+      std_msgs::msg::Float32 depth_msg;
+      // depth_msg.header.stamp = this->get_clock()->now();  
+      depth_msg.data = packet.press_abs; 
+      depth_pub_->publish(depth_msg);
+      // RCLCPP_INFO(this->get_logger(), "depth: %f", packet.press_abs);
 
     }
   }
