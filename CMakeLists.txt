@@ -16,6 +16,9 @@ find_package(mavros_msgs REQUIRED)
 find_package(mavlink REQUIRED)
 find_package(rclcpp REQUIRED)   
 
+find_package(tf2 REQUIRED)
+find_package(tf2_ros REQUIRED)
+
 add_executable(run_manual src/run_manual.cpp)
 target_include_directories(run_manual PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -27,6 +30,8 @@ ament_target_dependencies(run_manual
   rclcpp
   mavros_msgs
   mavlink
+  tf2
+  tf2_ros
 )
 
 install(TARGETS run_manual
