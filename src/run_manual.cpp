@@ -46,8 +46,8 @@ private:
   bool have_time_sync_{false};
   uint32_t base_boot_ms_{0};
   rclcpp::Time base_ros_time_{0, 0, RCL_ROS_TIME};
-  bool have_depth_zero_ = false;
-  float depth_zero_ = 0.0f;
+  // bool have_depth_zero_ = false;
+  // float depth_zero_ = 0.0f;
 
   static bool light;
   static float gripper;
@@ -218,16 +218,17 @@ private:
       // std_msgs::msg::Float32 depth_msg;
       // depth_msg.data = packet.press_abs;
 
-      float depth;
+      // float depth;
 
-      if (!have_depth_zero_)
-      {
-        depth_zero_ = packet.press_abs;   
-        have_depth_zero_ = true;
-      }
+      // if (!have_depth_zero_)
+      // {
+      //   depth_zero_ = packet.press_abs;   
+      //   have_depth_zero_ = true;
+      // }
 
-      depth = packet.press_abs - depth_zero_;
-      
+      // depth = packet.press_abs - depth_zero_;
+      const float depth = packet.press_abs;
+
       const uint32_t boot_ms = packet.time_boot_ms;
       if (!have_time_sync_)
       {
