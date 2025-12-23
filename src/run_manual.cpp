@@ -227,7 +227,8 @@ private:
       // }
 
       // depth = packet.press_abs - depth_zero_;
-      const float depth = packet.press_abs;
+      const float depth_ekf = packet.press_abs;
+      const float depth_baro = packet.press_diff;
 
       const uint32_t boot_ms = packet.time_boot_ms;
       if (!have_time_sync_)
@@ -242,8 +243,8 @@ private:
       depth_msg.header.stamp = stamp;
       depth_msg.header.frame_id = "base_link";
       depth_msg.point.x = 0.0;
-      depth_msg.point.y = 0.0;
-      depth_msg.point.z = depth;
+      depth_msg.point.y = depth_baro;
+      depth_msg.point.z = depth_ekf;
       depth_pub_->publish(depth_msg);
     }
   }
