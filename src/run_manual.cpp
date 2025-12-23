@@ -227,11 +227,11 @@ private:
       const uint32_t dt_ms = boot_ms - base_boot_ms_;
       const rclcpp::Time stamp = base_ros_time_ + rclcpp::Duration(0, static_cast<int64_t>(dt_ms) * 1000000LL);
       geometry_msgs::msg::PointStamped depth_msg;
-      out.header.stamp = stamp;
-      out.header.frame_id = "base_link";
-      out.point.x = 0.0;
-      out.point.y = 0.0;
-      out.point.z = depth;
+      depth_msg.header.stamp = stamp;
+      depth_msg.header.frame_id = "base_link";
+      depth_msg.point.x = 0.0;
+      depth_msg.point.y = 0.0;
+      depth_msg.point.z = depth;
       depth_pub_->publish(depth_msg);
     }
   }
